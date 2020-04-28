@@ -9,8 +9,6 @@
 import UIKit
 
 class ToDo {
-    var name = " "
-    var author = " "
-    var genre = " "
-    var important = Bool()
+    var title = " "
+    var recommended = Bool()
 }
