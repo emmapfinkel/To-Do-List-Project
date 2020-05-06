@@ -10,29 +10,29 @@ import UIKit
 
 class TableViewController: UITableViewController {
 
-    var toDos : [ToDo] = []
+    var toDos : [ToDoCD] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        getToDos()
 
-      toDos = createToDos()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        getToDos()
     }
     
-    func createToDos() -> [ToDo] {
-        let book1 = ToDo()
-        book1.title = "The Great Believers"
-        book1.recommended = true
-             
-        let book2 = ToDo()
-        book2.title = "Goldfinch"
-             
-        return [book1, book2]
+    func getToDos() {
+        
+        if let context = (UIApplication.shared.delegate as? AppDelegate)?.persistentContainer.viewContext {
+            
+            if let coreDataToDos = try? context.fetch(ToDoCD.fetchRequest()) as? [ToDoCD] {
+                toDos = coreDataToDos
+                tableView.reloadData()
+            }
+        }
     }
     
-    
-
-    // MARK: - Table view data source
-
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
         return 1
@@ -48,13 +48,14 @@ class TableViewController: UITableViewController {
 
         let toDo = toDos[indexPath.row]
         
-        if toDo.recommended {
-            cell.textLabel?.text = "👍🏼" + toDo.title
+        if let title = toDo.title {
+            if toDo.recommended {
+                cell.textLabel?.text = "👍🏼" + title
+            }
+            else {
+                cell.textLabel?.text = title
+            }
         }
-        else {
-            cell.textLabel?.text = toDo.title
-        }
-            
         return cell
     }
     
@@ -71,7 +72,7 @@ class TableViewController: UITableViewController {
         }
         
         if let completeVC = segue.destination as? CompleteToDoViewController {
-            if let toDo = sender as? ToDo {
+            if let toDo = sender as? ToDoCD {
                 completeVC.selectedToDo = toDo
                 completeVC.previousVC = self
             }
